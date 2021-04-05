@@ -1,0 +1,39 @@
+{
+  "name": "@vidalii/erp",
+  "version": "1.0.0",
+  "description": "ERP",
+  "main": "index.js",
+  "bin": {
+    "vidalii-erp": "cli/cli.js"
+  },
+  "scripts": {
+    "test1": "nodemon --ext ts  --watch '**.*ts' --exec 'ts-node src/service.cli start --DB_PATH=./tests/test1'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/royalcala/vidalii-erp.git"
+  },
+  "keywords": [
+    "ERP",
+    "CRM"
+  ],
+  "author": {
+    "email": "alcala.rao@gmail.com",
+    "name": "Roy Alcala Ortiz"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/royalcala/vidalii-erp/issues"
+  },
+  "homepage": "https://github.com/royalcala/vidalii-erp#readme",
+  "dependencies": {
+    "@vidalii/backend": "^0.0.30",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "p-limit": "^3.1.0",
+    "yargs": "^15.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.37"
+  }
+}

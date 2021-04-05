@@ -1,0 +1,1 @@
+# vidalii-frontend-template

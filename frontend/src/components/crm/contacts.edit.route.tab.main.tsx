@@ -1,12 +1,11 @@
 import React from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
-import { PropsTab, Tab } from '../admin/Admin.Doc.Tabs';
-import { TableEdit, TableProps } from "../form/Table.Edit";
+import { PropsTab, Tab } from '../core/admin/Admin.Doc.Tabs';
+import { TableEdit, TableProps } from "../core/form/Table.Edit";
 import util from "util";
 import { useQuery } from 'graphql-hooks';
 import { useParams } from 'react-router-dom';
-import { Form, FormProps } from '../form/form';
-
+import { Form, FormProps } from '../core/form/form';
 
 
 
@@ -18,11 +17,8 @@ function TabMain({ mutation }: PropsTab) {
  {
     user:userFind(operators:"${params._id}") {
     _id
-    name
-    lastname
-    email
-    phone
-    groups  
+    _id_company
+
   }
 }
   `)
@@ -41,10 +37,6 @@ function TabMain({ mutation }: PropsTab) {
     }
   )
 
-
-  if (loading) return 'loading...'
-  else if (error) return 'Error:' + JSON.stringify(error)
-
   const config: FormProps['config'] = {
     name: {
       alias: "Name",
@@ -54,23 +46,18 @@ function TabMain({ mutation }: PropsTab) {
       alias: "LastName",
       type: 'string'
     },
-    email: {
-      type: 'email'
-    },
-    groups: {
-      type: "autocomplete",
-      autoComplete: {
-       isMulti:true,
-       loadOptions
-      }
+    email:{
+      type:'email'
     }
   }
-
-  return <Form
-    data={data.user[0]}
-    config={config}
-    control={control}
-  />
+  if (loading) return 'loading...'
+  else if (error) return 'Error:' + JSON.stringify(error)
+  else
+    return <Form
+      data={data.user[0]}
+      config={config}
+      control={control}
+    />
 }
 
 

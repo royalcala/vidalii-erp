@@ -5,6 +5,7 @@
     "email": "alcala.rao@gmail.com",
     "name": "Roy Alcala Ortiz"
   },
+  "proxy": "http://localhost:4001/graphql",
   "homepage": "app",
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
@@ -21,15 +22,18 @@
     "react-hook-form": "^6.15.4",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
+    "react-select": "^4.3.0",
     "react-table": "^7.6.3",
     "template-core": "npm:@material-ui/core@^4.11.2",
     "template-icons": "npm:@material-ui/icons@^4.11.2",
+    "template-lab": "npm:@material-ui/lab@^4.0.0-alpha.57",
     "typescript": "^4.1.2",
     "web-vitals": "^1.0.1"
   },
   "devDependencies": {
     "@types/react-form": "^2.16.2",
     "@types/react-router-dom": "^5.1.6",
+    "@types/react-select": "^4.0.14",
     "@types/webpack-env": "^1.16.0"
   },
   "scripts": {

@@ -57,9 +57,6 @@ function TabMain({ mutation }: PropsTab) {
     },
     phone: {
       type: 'number'
-    },
-    password: {
-      type: 'number'
     }
   }
   return <Form

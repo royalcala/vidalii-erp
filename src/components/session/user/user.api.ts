@@ -56,8 +56,6 @@ export class UserUpdate {
     @api.Field({ nullable: true })
     phone: string
 
-    @api.Field({ nullable: true })
-    password: string
 }
 
 @api.Resolver(of => User)
@@ -68,7 +66,8 @@ export class UserResolver {
         @api.Ctx() context: ContextSession
     ) {
         const _id = context.session._id_user
-        const user = await context.em.findOne(UserEntity, _id)
+        const user = await context.em.findOne(UserEntity, _id)   
+    
         return user
     }
 
@@ -104,8 +103,6 @@ export class UserResolver {
         if (prevData === null)
             throw new Error(`The _id:${_id}, doesnt exist on database`)
 
-        if (userUpdate?.password)
-            userUpdate.password = await hash(userUpdate.password)
         const newOne = orm.wrap(prevData).assign(userUpdate)
         return newOne
     }

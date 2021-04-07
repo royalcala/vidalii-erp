@@ -14,14 +14,18 @@ export class UserGroupResolver {
         return Object.values(Groups)
     }
 
-    @api.FieldResolver(returnType => [Groups])
+    @api.FieldResolver(returnType => [JsonScalar])
     @Auth.Query([Groups.admin])
     async groups(
         @api.Root() user: User,
-        @api.Ctx() context: Context
+        @api.Ctx() context: Context,
+        @api.Arg('selectFormat', { defaultValue: false, nullable: true }) selectFormat: boolean
     ) {
         const group = await context.em.findOne(usergroup, { id_user: user._id })
-        return group.group
+        if (selectFormat)
+            return group.group.map(value => ({ label: value, value }))
+        else
+            return group.group
         //one to many
         // const groups = (await context.em.find(usergroup, { id_user: user._id }))
         //     .map(

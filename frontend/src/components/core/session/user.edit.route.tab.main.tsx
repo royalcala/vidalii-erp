@@ -22,7 +22,7 @@ function TabMain({ mutation }: PropsTab) {
     lastname
     email
     phone
-    groups  
+    groups(selectFormat:true)
   }
 }
   `)
@@ -45,6 +45,8 @@ function TabMain({ mutation }: PropsTab) {
   if (loading) return 'loading...'
   else if (error) return 'Error:' + JSON.stringify(error)
 
+  console.log('dataUser::', data.user[0])
+  // data.user[0].groups = (data.user[0].groups).map((value: string) => ({ value, label: value }))
   const config: FormProps['config'] = {
     name: {
       alias: "Name",
@@ -60,8 +62,14 @@ function TabMain({ mutation }: PropsTab) {
     groups: {
       type: "autocomplete",
       autoComplete: {
-       isMulti:true,
-       loadOptions
+        isMulti: true,
+        loadOptions: async (inputValue) =>
+          ([{ value: "ho", label: "he" }]) //fetch
+        // new Promise(resolve => {
+        //   setTimeout(() => {
+        //     resolve([{ value: "ho", label: "he" }]);
+        //   }, 0);
+        // }),
       }
     }
   }

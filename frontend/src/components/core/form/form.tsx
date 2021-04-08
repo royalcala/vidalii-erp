@@ -49,7 +49,6 @@ export function Form(props: FormProps) {
                     defaultValue={props.data[key]}
                     rules={config?.rules ? config.rules : {}}
                     render={({ onChange, value }) => {
-                        console.log(value)
                         if (config.type === 'autocomplete')
                             return (
                                 <FormControl fullWidth={config?.fullWidth ? true : false}>

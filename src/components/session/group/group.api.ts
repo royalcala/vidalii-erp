@@ -8,14 +8,19 @@ import { Groups } from "./group.enum.api";
 export class UserGroupResolver {
 
     //QUERY
-    @api.Query(returnType => [Groups])
-    @Auth.Query([Groups.admin])
-    groupList() {
-        return Object.values(Groups)
+    @api.Query(returnType => [JsonScalar])
+    // @Auth.Query([Groups.admin])
+    groupList(
+        @api.Arg('selectFormat', { defaultValue: false, nullable: true }) selectFormat: boolean
+    ) {
+        if (selectFormat)
+            return Object.values(Groups).map(value => ({ label: value, value }))
+        else
+            return Object.values(Groups)
     }
 
     @api.FieldResolver(returnType => [JsonScalar])
-    @Auth.Query([Groups.admin])
+    // @Auth.Query([Groups.admin])
     async groups(
         @api.Root() user: User,
         @api.Ctx() context: Context,

@@ -1,8 +1,9 @@
 import React from "react";
 import { Route } from "components/core/routes/Routes.many.rcontext";
 import AccountIcon from 'template-icons/AccountCircle';
-import { TableView, TableProps } from "../form/Table.View";
 import { useQuery } from "graphql-hooks";
+import { Dashboard, Props } from "../admin/Admin.Dashboard";
+import PeopleIcon from 'template-icons/People';
 const route: Route = {
     name: 'Users',
     parent: 'System',
@@ -30,17 +31,38 @@ function Users() {
     const { loading, error, data } = useQuery(QUERY)
     if (loading) return 'Loading...'
     if (error) return 'Error:' + JSON.stringify(error)
-    const config: TableProps['config'] = {
-        _id: {
-            alias: "ID",
-            type: 'string'
-        },
-        lastname: {
-            alias: "LastName",
-            type: "string"
+
+    const props: Props = {
+        Icon: route.Icon,
+        name: route.name,
+        parent: route.parent,
+        table: {
+            config: {
+                _id: {
+                    type: 'string'
+                },
+                name: {
+                    type: "string"
+                },
+                lastname: {
+                    type: "string"
+                },
+                email: {
+                    type: "email"
+                },
+                phone: {
+                    type: "number"
+                },
+                groups: {
+                    type: "number"
+                }
+            },
+            data: data.users,
+            open: { url: "/System.User", parameters: ['_id'] }
+
         }
     }
-    return <TableView config={config} data={data.users} open={{ url: "/System.User", parameters: ['_id'] }} />
+    return <Dashboard {...props} />
 }
 
 

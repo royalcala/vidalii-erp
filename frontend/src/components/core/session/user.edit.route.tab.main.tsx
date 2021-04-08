@@ -1,11 +1,11 @@
 import React from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
+import {  useForm } from 'react-hook-form';
 import { PropsTab, Tab } from '../admin/Admin.Doc.Tabs';
-import { TableEdit, TableProps } from "../form/Table.Edit";
-import util from "util";
+
 import { useQuery } from 'graphql-hooks';
 import { useParams } from 'react-router-dom';
 import { Form, FormProps } from '../form/form';
+import { objectString } from '../form/utils';
 
 
 
@@ -24,16 +24,21 @@ function TabMain({ mutation }: PropsTab) {
     phone
     groups(selectFormat:true)
   }
+  groups:groupList(selectFormat:true)
 }
   `)
 
   mutation.set(Mutation,
     () => {
-      //util.inspect for print object to string
-      const values = util.inspect(getValues()).replaceAll("'", '"')
+      const values = getValues()
+      //@ts-ignore
+      values.groups = values.groups.map(
+        (data: { label: string, value: string }) => data.value
+      )
+      const objString = objectString(getValues())
       return `#graphql
       userUpdate(
-        user: ${values},
+        user: ${objString},
         _id:\"${params._id}\"){
         _id
       }
@@ -43,10 +48,10 @@ function TabMain({ mutation }: PropsTab) {
 
 
   if (loading) return 'loading...'
-  else if (error) return 'Error:' + JSON.stringify(error)
+  else if (error) return JSON.stringify(error)
+  else if (!data?.user[0])
+    return `User not found`
 
-  console.log('dataUser::', data.user[0])
-  // data.user[0].groups = (data.user[0].groups).map((value: string) => ({ value, label: value }))
   const config: FormProps['config'] = {
     name: {
       alias: "Name",
@@ -63,13 +68,10 @@ function TabMain({ mutation }: PropsTab) {
       type: "autocomplete",
       autoComplete: {
         isMulti: true,
-        loadOptions: async (inputValue) =>
-          ([{ value: "ho", label: "he" }]) //fetch
-        // new Promise(resolve => {
-        //   setTimeout(() => {
-        //     resolve([{ value: "ho", label: "he" }]);
-        //   }, 0);
-        // }),
+        loadOptions: async (inputValue) => data.groups.filter(
+          (group: { value: string, label: string }) => group.label.toLowerCase()
+            .includes(inputValue.toLowerCase())
+        )
       }
     }
   }

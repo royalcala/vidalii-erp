@@ -13,7 +13,7 @@ import IconButton from 'template-core/IconButton';
 import Tooltip from 'template-core/Tooltip';
 // import Link from 'template-core/Link';
 import { Link } from 'react-router-dom'
-import { FormControl, FormHelperText, Input, InputLabel } from "template-core";
+import { Button, FormControl, FormHelperText, Grid, Input, InputLabel, TextField } from "template-core";
 import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles({
@@ -26,7 +26,7 @@ const useStyles = makeStyles({
 export type TableProps = {
     config: {
         [key: string]: {
-            alias: string,
+            alias?: string,
             type: 'string' | 'number' | 'email' | 'password' | 'autocompletes'//html5
         }
     },
@@ -41,69 +41,86 @@ export function TableView(props: TableProps) {
     const classes = useStyles();
     const entries = Object.entries(props.config)
     let history = useHistory();
-    return (
-        <TableContainer component={Paper}>
-            <Table className={classes.table} size="small" aria-label="dense table">
-                <TableHead>
-                    <TableRow>
-                        <TableCell align="left" key={0} />
-                        {entries.map(
-                            ([key, value], index) => (
-                                <TableCell align="left" key={index + 1}>
-                                    <FormControl variant="filled">
-                                        <InputLabel htmlFor={key + index}>{value.alias}</InputLabel>
-                                        <Input
-                                            id={key + index}
-                                            onChange={() => { }}
-                                            name={key}
-                                        />
-                                    </FormControl>
-                                </TableCell>
-                            )
-                        )}
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {
-                        props.data.map(
-                            (row, indexRow) => {
-                                return (
-                                    <TableRow key={indexRow}>
-                                        <TableCell align="left" key={indexRow}>
-                                            <Tooltip title="Open">
-                                                {/* <IconButton color="inherit" aria-label="Delete" */}
-                                                <Link to={props.open.url + `/${props.open.parameters.map(
-                                                    nameParameter => {
-                                                        return row[nameParameter]
-                                                    }
-                                                ).join('/')
-                                                    }`}
-                                                // onClick={() => {
-                                                //     history.push(props.routeToOpen);
-                                                // }}}
-                                                >
-                                                    <OpenInNewIcon style={{ color: blue[300] }} />
-                                                    {/* </IconButton> */}
-                                                </Link>
-                                            </Tooltip>
-                                        </TableCell>
-                                        {entries.map(
-                                            ([nameField, configField], index) => {
-                                                return (
-                                                    <TableCell align="left" key={index} >
-                                                        {row[nameField]}
-                                                    </TableCell>
-                                                )
-                                            }
-                                        )}
-                                    </TableRow>
-                                )
-                            }
 
-                        )
-                    }
-                </TableBody>
-            </Table>
-        </TableContainer>
+    return (
+        <Grid
+            container
+            direction="row"
+            justify="flex-end"
+            alignItems="center"
+            spacing={3}
+        >
+            <Grid item >
+                <TextField id="filled-basic" label="Query" />
+            </Grid>
+            <Grid item>
+                <Button variant="contained" color="primary">
+                    Search
+                </Button>
+            </Grid>
+            <TableContainer>
+                <Table className={classes.table} size="small" aria-label="dense table">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell align="left" key={0} />
+                            {entries.map(
+                                ([key, value], index) => (
+                                    <TableCell align="left" key={index + 1}>
+                                        <FormControl variant="filled">
+                                            <InputLabel htmlFor={key + index}>{value?.alias ? value.alias : key}</InputLabel>
+                                            <Input
+                                                id={key + index}
+                                                onChange={() => { }}
+                                                name={key}
+                                            />
+                                        </FormControl>
+                                    </TableCell>
+                                )
+                            )}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {
+                            props.data.map(
+                                (row, indexRow) => {
+                                    return (
+                                        <TableRow key={indexRow}>
+                                            <TableCell align="left" key={indexRow}>
+                                                <Tooltip title="Open">
+                                                    {/* <IconButton color="inherit" aria-label="Delete" */}
+                                                    <Link to={props.open.url + `/${props.open.parameters.map(
+                                                        nameParameter => {
+                                                            return row[nameParameter]
+                                                        }
+                                                    ).join('/')
+                                                        }`}
+                                                    // onClick={() => {
+                                                    //     history.push(props.routeToOpen);
+                                                    // }}}
+                                                    >
+                                                        <OpenInNewIcon style={{ color: blue[300] }} />
+                                                        {/* </IconButton> */}
+                                                    </Link>
+                                                </Tooltip>
+                                            </TableCell>
+                                            {entries.map(
+                                                ([nameField, configField], index) => {
+                                                    return (
+                                                        <TableCell align="left" key={index} >
+                                                            {row[nameField]}
+                                                        </TableCell>
+                                                    )
+                                                }
+                                            )}
+                                        </TableRow>
+                                    )
+                                }
+
+                            )
+                        }
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Grid>
     )
 }

@@ -39,19 +39,24 @@ function Users() {
         table: {
             config: {
                 _id: {
-                    type: 'string'
+                    type: 'string',
+                    search:true
                 },
                 name: {
-                    type: "string"
+                    type: "string",
+                    search:true
                 },
                 lastname: {
-                    type: "string"
+                    type: "string",
+                    search:true
                 },
                 email: {
-                    type: "email"
+                    type: "email",
+                    search:true
                 },
                 phone: {
-                    type: "number"
+                    type: "number",
+                    search:true
                 },
                 groups: {
                     type: "number"

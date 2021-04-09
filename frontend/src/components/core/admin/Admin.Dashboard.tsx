@@ -31,7 +31,7 @@ export type Props = {
     table: TableProps
 }
 export function Dashboard(props: Props) {
-    const [query,setQuery]=React.useState()
+    const [query, setQuery] = React.useState()
 
     const classes = useStyles();
     return <Paper className={classes.paper}>

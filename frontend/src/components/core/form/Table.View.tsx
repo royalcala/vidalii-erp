@@ -6,15 +6,12 @@ import TableCell from 'template-core/TableCell';
 import TableContainer from 'template-core/TableContainer';
 import TableHead from 'template-core/TableHead';
 import TableRow from 'template-core/TableRow';
-import Paper from 'template-core/Paper';
 import OpenInNewIcon from 'template-icons/OpenInNew';
 import { blue } from 'template-core/colors';
-import IconButton from 'template-core/IconButton';
 import Tooltip from 'template-core/Tooltip';
-// import Link from 'template-core/Link';
 import { Link } from 'react-router-dom'
-import { Button, FormControl, FormHelperText, Grid, Input, InputLabel, TextField } from "template-core";
-import { useHistory } from "react-router-dom";
+import { Button, Grid, TextField } from "template-core";
+import { useForm } from "react-hook-form";
 
 const useStyles = makeStyles({
     table: {
@@ -27,7 +24,8 @@ export type TableProps = {
     config: {
         [key: string]: {
             alias?: string,
-            type: 'string' | 'number' | 'email' | 'password' | 'autocompletes'//html5
+            type: 'string' | 'number' | 'email' | 'password' | 'autocompletes',//html5
+            search?: boolean
         }
     },
     data: any[]
@@ -40,8 +38,13 @@ export type TableProps = {
 export function TableView(props: TableProps) {
     const classes = useStyles();
     const entries = Object.entries(props.config)
-    let history = useHistory();
-
+    const { control, getValues } = useForm<{}>()
+    const onSearch = (e: any) => {
+        if (e.key === 'Enter') {
+            console.log('enter pressed');
+            //TODO run query for search
+        }
+    }
     return (
         <Grid
             container
@@ -66,14 +69,11 @@ export function TableView(props: TableProps) {
                             {entries.map(
                                 ([key, value], index) => (
                                     <TableCell align="left" key={index + 1}>
-                                        <FormControl variant="filled">
-                                            <InputLabel htmlFor={key + index}>{value?.alias ? value.alias : key}</InputLabel>
-                                            <Input
-                                                id={key + index}
-                                                onChange={() => { }}
-                                                name={key}
-                                            />
-                                        </FormControl>
+                                        {value?.search === true
+                                            ? <TextField label={value?.alias ? value.alias : key} onKeyDown={onSearch} />
+                                            : value?.alias ? value.alias : key
+                                        }
+
                                     </TableCell>
                                 )
                             )}
@@ -94,12 +94,8 @@ export function TableView(props: TableProps) {
                                                         }
                                                     ).join('/')
                                                         }`}
-                                                    // onClick={() => {
-                                                    //     history.push(props.routeToOpen);
-                                                    // }}}
                                                     >
                                                         <OpenInNewIcon style={{ color: blue[300] }} />
-                                                        {/* </IconButton> */}
                                                     </Link>
                                                 </Tooltip>
                                             </TableCell>
@@ -121,6 +117,12 @@ export function TableView(props: TableProps) {
                     </TableBody>
                 </Table>
             </TableContainer>
+            <Grid item >
+                Prev
+            </Grid>
+            <Grid item >
+                Next
+            </Grid>
         </Grid>
     )
 }

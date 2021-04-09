@@ -5,19 +5,6 @@ import { Groups } from "../group/group.enum.api";
 
 VidaliiService.db.addDbInit(
     async orm => {
-        // const g1 = new group()
-        // g1.name = "admin"
-        // g1.pre_persist()
-
-        // const g2 = new group()
-        // g2.name = "user"
-        // g2.pre_persist()
-
-        // const g3 = new group()
-        // g3.name = GUEST
-        // g3.pre_persist()
-
-        // await orm.em.persist([g1, g2,g3])
 
         const user = new UserEntity()
         user.name = "admin"

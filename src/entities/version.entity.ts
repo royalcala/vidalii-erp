@@ -10,8 +10,15 @@ export class Version {
 
     @Index()
     @Property()
-    document_id: string
+    id_document: string
+
+    @Property()
+    id_user: string
 
     @Property({ type: DateType, nullable: true })
     update: Date;
+
+    pre_insert(){
+        
+    }
 }

@@ -3,15 +3,14 @@ import { Db } from "./db";
 import { glob } from "glob";
 import { EntityManager, IDatabaseDriver, Connection } from "@mikro-orm/core";
 import type { OptionsCli } from "./service.cli";
-
-export type Request = {
+import jwt from "jsonwebtoken";
+export type Context = {
     em: EntityManager<IDatabaseDriver<Connection>>,
-    body: object,
-    query: object,
-    params: object
+    token: { id_user } | null
 }
 
 export const app = express()
+export const SECRET = process?.env?.SECRET || 'vidalii'
 
 
 export async function startService(args: OptionsCli) {
@@ -19,11 +18,24 @@ export async function startService(args: OptionsCli) {
     //init orm
     let db: Db
     app.use(express.json());
-    app.use((req:any, res, next) => {
-        //@ts-ignore
-        //get token
-        req.session = ''
-        req.em = db.orm.em.fork()
+    app.use(async (req:any, res, next) => {
+        let token = null
+        let auth = req?.headers?.authorization || null
+        if (auth !== null) {
+            const chain = auth.split('Bearer ')[1];
+            const check = await jwt.verify(chain, SECRET, (err, decoded) => {
+                if (err) {
+                    token = null
+                }
+                else
+                    token = decoded
+            })
+
+        }
+        req.context = {
+            em: db.orm.em.fork(),
+            token,
+        }
         next();
     })
     db = await new Db(args).startDB()

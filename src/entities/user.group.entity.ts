@@ -1,9 +1,10 @@
 import { Collection, Entity, ManyToMany, PrimaryKey, Property } from "@mikro-orm/core";
+import { ObjectId } from "@mikro-orm/mongodb";
 import { User } from "./user.entity";
 
 
 @Entity()
-export class Groups {
+export class Group{
 
     @PrimaryKey()
     _id: string
@@ -12,6 +13,9 @@ export class Groups {
     name: string
 
     @ManyToMany(() => User, user => user.groups)
-    books: Collection<User> = new Collection<User>(this);
+    users: Collection<User> = new Collection<User>(this);
 
+    pre_persist() {
+        this._id = new ObjectId().toHexString()
+    }
 }

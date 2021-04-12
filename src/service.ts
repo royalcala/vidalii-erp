@@ -18,12 +18,12 @@ export async function startService(args: OptionsCli) {
     //init orm
     let db: Db
     app.use(express.json());
-    app.use(async (req:any, res, next) => {
+    app.use(async (req: any, res, next) => {
         let token = null
         let auth = req?.headers?.authorization || null
         if (auth !== null) {
             const chain = auth.split('Bearer ')[1];
-            const check = await jwt.verify(chain, SECRET, (err, decoded) => {
+            await jwt.verify(chain, SECRET, (err, decoded) => {
                 if (err) {
                     token = null
                 }

@@ -8,6 +8,7 @@ import { hash, verifyPassword } from "./user.password.lib";
 import { Version } from "./version.entity";
 import { Group } from "./user.group.entity";
 import jwt from "jsonwebtoken";
+
 @Entity()
 export class User {
     @PrimaryKey()
@@ -38,6 +39,7 @@ export class User {
     }
 }
 
+
 app.post('/userVersions', async (req: any, res) => {
     const context = req.context as Context
     const versions = await context.em.find(Version, { id_document: req.body.id_document })
@@ -51,9 +53,9 @@ app.post('/userFind', async (req: any, res) => {
     res.send(users)
 })
 app.post('/userInsert', async (req: any, res, next) => {
-    //check token is admin
+    const data = req.body as User
     const context = req.context as Context
-    const user = context.em.assign(new User(), req.body)
+    const user = context.em.assign(new User(), data)
     user.pre_persist()
     await val.validateOrReject(user)
     await context.em.persistAndFlush(user)
@@ -62,11 +64,10 @@ app.post('/userInsert', async (req: any, res, next) => {
 })
 
 
-app.post('userLogin', async (req: any, res) => {
+app.post('/userLogin', async (req: any, res) => {
     const { email, password } = req.body;
     const context = req.context as Context
     const user = await context.em.findOne(User, { email })
-
     if (!user)
         res.send({ error: { msg: `Wrong credentials` } })
 
@@ -83,5 +84,4 @@ app.post('userLogin', async (req: any, res) => {
     )
 
     res.send(token)
-    // return token
 })

@@ -9,7 +9,7 @@ export default async function (orm: Db['orm']) {
     user.firstname = "admin"
     user.lastname = "admin"
     user.password = "admin"
-    user.email = "admin@vidalii.com"
+    user.email = "alcala.rao@gmail.com"
     user.phone = "4491862098"
     user.pre_persist()
 
@@ -17,8 +17,8 @@ export default async function (orm: Db['orm']) {
     group.name = "admin"
     group.pre_persist()
 
-    
-    user.groups.add(group)
+
+    // user.groups.add(group)
     // thanks to bi-directional cascading we only need to persist user entity
     orm.em.persist(user)
     await orm.em.flush()

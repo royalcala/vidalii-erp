@@ -1,6 +1,6 @@
 import { User } from "./user.entity";
 import { Group } from "./user.group.entity";
-import { Db } from "../db";
+import { Db } from "../../db";
 
 
 export default async function (orm: Db['orm']) {
@@ -18,8 +18,8 @@ export default async function (orm: Db['orm']) {
     group.pre_persist()
 
 
-    // user.groups.add(group)
     // thanks to bi-directional cascading we only need to persist user entity
+    user.groups.add(group)
     orm.em.persist(user)
     await orm.em.flush()
 

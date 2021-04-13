@@ -1,13 +1,13 @@
-import { PrimaryKey, OneToMany, Collection, ManyToMany } from "@mikro-orm/core";
+import { PrimaryKey, OneToMany, Collection, ManyToMany, BeforeCreate, OneToOne } from "@mikro-orm/core";
 import { Property } from "@mikro-orm/core";
 import { Entity } from "@mikro-orm/core";
-import { app, Context, SECRET } from "../service";
+import { app, Context, SECRET } from "../../service";
 import * as val from "class-validator";
 import { ObjectId } from '@mikro-orm/mongodb'
 import { hash, verifyPassword } from "./user.password.lib";
-import { Version } from "./version.entity";
 import { Group } from "./user.group.entity";
 import jwt from "jsonwebtoken";
+import { Version } from "../version.entity";
 
 @Entity()
 export class User {
@@ -37,37 +37,14 @@ export class User {
         this._id = new ObjectId().toHexString()
         this.password = hash(this.password)
     }
+
 }
-
-
-app.post('/userVersions', async (req: any, res) => {
-    const context = req.context as Context
-    const versions = await context.em.find(Version, { id_document: req.body.id_document })
-    res.send(versions)
-})
-
-app.post('/userFind', async (req: any, res) => {
-    //check token is admin
-    const context = req.context as Context
-    const users = await context.em.find(User, req.body)
-    res.send(users)
-})
-app.post('/userInsert', async (req: any, res, next) => {
-    const data = req.body as User
-    const context = req.context as Context
-    const user = context.em.assign(new User(), data)
-    user.pre_persist()
-    await val.validateOrReject(user)
-    await context.em.persistAndFlush(user)
-
-    res.send(user)
-})
 
 
 app.post('/userLogin', async (req: any, res) => {
     const { email, password } = req.body;
     const context = req.context as Context
-    const user = await context.em.findOne(User, { email })
+    const user = await context.em.findOne(User, { email }, ['groups'])
     if (!user)
         res.send({ error: { msg: `Wrong credentials` } })
 
@@ -77,11 +54,35 @@ app.post('/userLogin', async (req: any, res) => {
 
     const token = 'Bearer ' + jwt.sign(
         {
-            _id_user: user._id,
+            id_user: user._id,
+            groups: user.groups.getItems().map(group => group.name)
         },
         SECRET,
         { expiresIn: '1d' }
     )
 
     res.send(token)
+})
+
+
+
+
+app.post('/userFind', async (req: any, res) => {
+    //check token is admin
+    const context = req.context as Context
+    const users = await context.em.find(User, req.body)
+    res.send(users)
+})
+
+app.post('/userInsert', async (req: any, res, next) => {
+    const data = req.body as User
+    const context = req.context as Context
+    const user = context.em.assign(new User(), data)
+    user.pre_persist()
+    await val.validateOrReject(user)    
+    const version = new Version({ id_document: user._id, id_user: context.token.id_user })
+    context.em.persist([user, version])
+    await context.em.flush()
+
+    res.send(user)
 })

@@ -8,12 +8,15 @@ export class Db {
     private ormConfig: Options
     public orm: MikroORM<IDatabaseDriver<Connection>>
     private async initDefaultValues() {
-        const paths = glob.sync(this.cli.ENTITIES+`/entities/*.entity.init.{js,ts}`, { absolute: true })
+        console.log('db->initDefauls')
+        const paths = glob.sync(this.cli.ENTITIES + `/entities/**/*.entity.init.{js,ts}`, { absolute: true })
         for (let index = 0; index < paths.length; index++) {
+            console.log(paths[index])
             await require(paths[index]).default(this.orm)
         }
     }
     private async initSchema() {
+        console.log('initSchema')
         const generator = this.orm.getSchemaGenerator();
         await generator.dropSchema();
         await generator.createSchema();
@@ -29,8 +32,8 @@ export class Db {
             batchSize: 500,
             useBatchUpdates: true,
             useBatchInserts: true,
-            entities: [this.cli.ENTITIES + '/entities/*.entity.{js,ts}'],
-            entitiesTs: [this.cli.ENTITIES + '/entities/*.entity.{js,ts}'],
+            entities: [this.cli.ENTITIES + '/entities/**/*.entity.{js,ts}'],
+            entitiesTs: [this.cli.ENTITIES + '/entities/**/*.entity.{js,ts}'],
             dbName: this.cli.DB_PATH + '/data.db',
             cache: {
                 enabled: true,

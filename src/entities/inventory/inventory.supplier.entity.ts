@@ -31,7 +31,7 @@ app.post('/inventorySupplierInsert', async (req: any, res) => {
     const context = req.context as Context
     const supplier = context.em.assign(new Inventory_supplier(), data)
     supplier.pre_persist()
-    const version = new Version({ id_document: supplier._id, id_user: context.token.id_user })
+    const version = new Version({ id_document: supplier._id, user: context.token.id_user })
     context.em.persist([supplier, version])
     await context.em.flush()
     res.send(supplier)

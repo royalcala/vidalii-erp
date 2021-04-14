@@ -4,7 +4,8 @@ import glob from 'glob';
 import { OptionsCli } from './service.cli';
 
 export class Db {
-    constructor(private cli: OptionsCli) { }
+    public cli: OptionsCli
+    // constructor(private cli: OptionsCli) { }
     private ormConfig: Options
     public orm: MikroORM<IDatabaseDriver<Connection>>
     private async initDefaultValues() {
@@ -23,6 +24,7 @@ export class Db {
         await generator.updateSchema();
     }
     public async startDB() {
+        console.log('Starting db....')
         this.ormConfig = {
             // metadataProvider: TsMorphMetadataProvider,
             metadataProvider: ReflectMetadataProvider,
@@ -42,10 +44,14 @@ export class Db {
             },
             debug: this.cli.DEBUG,
         }
+        // console.log(this.ormConfig)
         this.orm = await MikroORM.init(this.ormConfig)
         await this.initSchema()
         await this.initDefaultValues()
-
+        console.log('Started db')
         return this
     }
 }
+
+export const db = new Db()
+

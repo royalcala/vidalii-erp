@@ -16,6 +16,8 @@ export const app = express()
 export const SECRET = process?.env?.SECRET || 'vidalii'
 
 
+
+
 export async function startService(args: OptionsCli) {
     return new Promise(async (resolve, reject) => {
 
@@ -44,7 +46,9 @@ export async function startService(args: OptionsCli) {
             }
             next();
         })
+        console.log("starting db....")
         db = await new Db(args).startDB()
+        console.log("db started")
         //others routes
         const paths = glob.sync(args.ENTITIES + '/**/*.entity.{ts,js}')
         for (let index = 0; index < paths.length; index++) {

@@ -1,10 +1,15 @@
 import { Entity, PrimaryKey, Property } from "@mikro-orm/core";
 import { ObjectId } from "@mikro-orm/mongodb";
+import { db } from "../../db";
 import { app, Context } from "../../service";
-import { Version } from "../version.entity";
+import { persistVersion, Version } from "../version.entity";
 
 @Entity()
 export class Inventory_supplier {
+    constructor() {
+        this._id = new ObjectId().toHexString()
+        persistVersion({ id_document: this._id })
+    }
     @PrimaryKey()
     _id: string
 
@@ -20,19 +25,20 @@ export class Inventory_supplier {
 
     @Property()
     postalCode: number
-
-    pre_persist() {
-        this._id = new ObjectId().toHexString()
-    }
 }
 
-app.post('/inventorySupplierInsert', async (req: any, res) => {
+app.post('/api/inventorySupplierInsert', async (req: any, res) => {
     const data = req.body as Inventory_supplier
-    const context = req.context as Context
-    const supplier = context.em.assign(new Inventory_supplier(), data)
-    supplier.pre_persist()
-    const version = new Version({ id_document: supplier._id, user: context.token.id_user })
-    context.em.persist([supplier, version])
-    await context.em.flush()
+    const supplier = db.orm.em.assign(new Inventory_supplier(), data)
+    db.orm.em.persist(supplier)
+    await db.orm.em.flush()
+    res.send(supplier)
+})
+
+app.post('/api/inventorySupplierUpdate', async (req: any, res) => {
+    const data = req.body as Inventory_supplier
+    let supplier = await db.orm.em.findOne(Inventory_supplier, data._id)
+    supplier = db.orm.em.assign(supplier, data)
+    await db.orm.em.flush()
     res.send(supplier)
 })

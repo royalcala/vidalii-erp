@@ -4,6 +4,7 @@ import { glob } from "glob";
 import { EntityManager, IDatabaseDriver, Connection, RequestContext } from "@mikro-orm/core";
 import type { OptionsCli } from "./service.cli";
 import jwt from "jsonwebtoken";
+import Path from "path";
 import { AsyncLocalStorage } from "async_hooks"
 export const asyncLocalStorage = new AsyncLocalStorage<Map<string, any>>();
 export type Context = {
@@ -73,17 +74,19 @@ export async function startService(args: OptionsCli) {
             }
             next();
         })
-        // console.log("starting db....")
-        // db = new Db()
-        db.cli = args
-        await db.startDB()
-        // console.log("db started")
+        app.use('/app', (express.static(Path.join(__dirname, '../frontend/build'))))
+        app.get('/app*', function (req, res) {
+            res.sendFile(Path.join(__dirname, '../frontend/build', 'index.html'));
+        });
         //others routes
         const paths = glob.sync(args.ENTITIES + '/**/*.entity.{ts,js}')
         for (let index = 0; index < paths.length; index++) {
             const path = paths[index];
             require(path)
         }
+
+        db.cli = args
+        await db.startDB()
         // app.use(async (req: any, res, next) => {
         //     console.log('inFlush')
         //     const em = req.em as Request['em']

@@ -9,8 +9,7 @@ import {
 } from "react-router-dom";
 import { theme } from './components/theme/theme';
 import UserSession from "./components/core/session/User.Session";
-import { QueryClient, QueryClientProvider, } from 'react-query'
-// import { GraphQLClient, ClientContext } from 'graphql-hooks'
+import { GraphQLClient, ClientContext } from 'graphql-hooks'
 // import { GraphQLClient } from "graphql-request";
 
 
@@ -18,21 +17,21 @@ import { QueryClient, QueryClientProvider, } from 'react-query'
 // export const Client = React.createContext({
 //   client
 // })
-// const client = new GraphQLClient({
-//   url: '/graphql'
-// })
-const queryClient = new QueryClient()
+const client = new GraphQLClient({
+  url: '/graphql'
+})
+
 
 ReactDOM.render(
   <React.StrictMode>
-    <BrowserRouter basename="/app">
-      <ThemeProvider theme={theme}>
-        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-        <CssBaseline />
-        <QueryClientProvider client={queryClient}>
-          <UserSession />
-        </QueryClientProvider>
-      </ThemeProvider>
+     <BrowserRouter basename="/app">
+      <ClientContext.Provider value={client}>
+        <ThemeProvider theme={theme}>
+          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+          <CssBaseline />
+          <UserSession/>
+        </ThemeProvider>
+      </ClientContext.Provider>
     </BrowserRouter>
   </React.StrictMode >,
   document.getElementById('root')

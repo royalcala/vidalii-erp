@@ -5,7 +5,7 @@
     "email": "alcala.rao@gmail.com",
     "name": "Roy Alcala Ortiz"
   },
-  "proxy": "http://localhost:4001/graphql",
+  "proxy": "http://localhost:4001",
   "homepage": "app",
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
@@ -15,11 +15,13 @@
     "@types/node": "^12.0.0",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
+    "axios": "^0.21.1",
     "graphql": "^15.5.0",
     "graphql-hooks": "^5.1.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-hook-form": "^6.15.4",
+    "react-query": "^3.13.9",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "react-select": "^4.3.0",

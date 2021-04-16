@@ -1,4 +1,4 @@
-import { Connection, IDatabaseDriver, MikroORM, EntityManager, Options, AnyEntity, wrap, ReflectMetadataProvider } from '@mikro-orm/core';
+import { Connection, IDatabaseDriver, MikroORM, EntityManager, Options, AnyEntity, wrap, ReflectMetadataProvider, FlushEventArgs } from '@mikro-orm/core';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 import glob from 'glob';
 import { OptionsCli } from './service.cli';
@@ -8,6 +8,9 @@ export class Db {
     // constructor(private cli: OptionsCli) { }
     private ormConfig: Options
     public orm: MikroORM<IDatabaseDriver<Connection>>
+
+    
+
     private async initDefaultValues() {
         console.log('db->initDefauls')
         const paths = glob.sync(this.cli.ENTITIES + `/entities/**/*.entity.init.{js,ts}`, { absolute: true })
@@ -25,6 +28,7 @@ export class Db {
     }
     public async startDB() {
         console.log('Starting db....')
+        
         this.ormConfig = {
             // metadataProvider: TsMorphMetadataProvider,
             metadataProvider: ReflectMetadataProvider,
@@ -54,4 +58,3 @@ export class Db {
 }
 
 export const db = new Db()
-

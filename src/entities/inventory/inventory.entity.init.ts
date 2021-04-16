@@ -17,23 +17,23 @@ export default async function Init_international_system_unit(orm: Db['orm']) {
     gram.name = "gram"
 
 
-    mass.reference_unit = kg
+
     kg.unitType = mass
+    gram.unitType = mass
 
     orm.em.persist([
         mass, kg, gram,
-
     ])
 
 
-    
+
     // //default
     // // const unitType2=new Inventory_items_units_type("distance")
     // // const unitType3=new Inventory_items_units_type("time")
     // // const unitType4=new Inventory_items_units_type("volume")
     // // const unitType5=new Inventory_items_units_type("unit")
 
-   
+
 
     await orm.em.flush()
 

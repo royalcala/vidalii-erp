@@ -1,6 +1,7 @@
 import { Entity, Property, PrimaryKey, Index, TimeType, OneToOne, OneToMany, ManyToMany, ManyToOne } from "@mikro-orm/core"
 import { ObjectId } from "@mikro-orm/mongodb";
-import { app, Context } from "../service";
+import { db } from "../db";
+import { app, asyncLocalStorage, Context, Token } from "../service";
 import { User } from "./user/user.entity";
 
 
@@ -36,3 +37,14 @@ app.post('/versions', async (req: any, res) => {
     const versions = await context.em.find(Version, documents)
     res.send(versions)
 })
+
+export function persistVersion({ id_document }) {
+    let version: Version
+    if (asyncLocalStorage.getStore()?.has('token')) {
+        const token: Token = asyncLocalStorage.getStore().get('token')
+        version = new Version({ id_document, user: token.id_user })
+    }
+    else
+        version = new Version({ id_document, user: null })
+    db.orm.em.persist(version)
+}

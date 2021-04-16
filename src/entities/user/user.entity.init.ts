@@ -5,13 +5,12 @@ import { Db } from "../../db";
 
 export default async function (orm: Db['orm']) {
 
-    const user = new User()
+    const user = new User("admin")
     user.firstname = "admin"
     user.lastname = "admin"
-    user.password = "admin"
     user.email = "alcala.rao@gmail.com"
     user.phone = "4491862098"
-    user.pre_persist()
+    // user.pre_persist()
 
     const group = new Group()
     group.name = "admin"

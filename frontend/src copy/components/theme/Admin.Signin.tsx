@@ -13,8 +13,11 @@ import Typography from 'template-core/Typography';
 import { makeStyles } from 'template-core/styles';
 import Container from 'template-core/Container';
 import { useForm } from 'react-hook-form';
-import { UseMutationResult } from 'react-query'
 
+
+//context
+// import { SessionContext } from '../../Session/User.Session'
+// import { SessionContext } from '../core/Session/User.Session'
 
 function Copyright() {
   return (
@@ -55,21 +58,18 @@ interface FormData {
   password: string;
 }
 
-export default function SignIn(props: { mutation: UseMutationResult<any,any,any> }) {
-
+export default function SignIn(props:{checkSession:(username: string, password: string) => Promise<void>}) {
+  const checkSession = props.checkSession as (username: string, password: string) => Promise<void>
   const { handleSubmit, register } = useForm<FormData>();
 
   const onSubmit = handleSubmit(
     async ({ username, password }) => {
-      props.mutation.mutate({ email: username, password })
-    })
+      await checkSession(username, password)
+    });
   const classes = useStyles()
 
   return (
-  
     <Container component="main" maxWidth="xs">
-        {props.mutation.isLoading && <div>Loading..</div>}
-        {props.mutation.isError && <div>Error:Try again</div>}
       <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>

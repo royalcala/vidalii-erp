@@ -29,7 +29,6 @@ export type TableProps = {
             alias?: string,
             format?: (value: any) => any
             search?: boolean
-            searchFormat?: (value: any) => any
         }
     },
     open: {
@@ -38,17 +37,15 @@ export type TableProps = {
     } // /route/:slug
 }
 
-
-
-
 export function TableView(props: TableProps) {
+    console.log('redered TableView')
     const classes = useStyles();
     const { client } = React.useContext(Session)
     const [search, setSearch] = React.useState({})
     const [isLoading, setIsLoading] = React.useState(false);
     const [isError, setIsError] = React.useState(false);
     const [data, setData] = React.useState([]);
-
+    //const [entries, setEntries] = React.useState(props.config)
     React.useEffect(() => {
         const fetchData = async () => {
             setIsError(false);
@@ -66,31 +63,21 @@ export function TableView(props: TableProps) {
         };
 
         fetchData();
-    }, [search])
-
+    }, [search]);
     const entries = Object.entries(props.config)
     const { control, getValues } = useForm<{}>()
-
-    const onSearch = () => {
-        const entries = Object.entries(getValues()).filter(
-            ([key, value]) => value !== ''
-        ).map(
-            ([key, value]) => {
-                if (props.config[key]?.searchFormat !== undefined) {  
-                    //@ts-ignore                  
-                    return [key, props.config[key].searchFormat(value)]
-                }
-                else //default
-                    return [key, { $like: `%${value}%` }]
-            }
-        )
-        let filter = Object.fromEntries(entries)
-        console.log({ filter })
-        //reload table
-        setSearch(filter)
+    const onSearch = (e: any) => {
+        if (e.key === 'Enter') {
+            console.log('click enterss')
+            const entries = Object.entries(getValues()).filter(
+                ([key, value]) => value !== ''
+            )
+            const filter = Object.fromEntries(entries)
+            console.log({ filter })
+            //reload table
+            setSearch(filter)
+        }
     }
-
-
     if (isLoading) return <div>Loading...</div>
     if (isError) return <div>Error</div>
     return (
@@ -101,21 +88,11 @@ export function TableView(props: TableProps) {
             alignItems="center"
             spacing={3}
         >
-            {/* <Grid item >
-                <Controller
-                    name="query"
-                    control={control}
-                    defaultValue=""                   
-                    render={({ onChange, value }) =>  <TextField 
-                    id="query" label="Query" 
-                    value={value}
-                    onChange={onChange}
-                     />}
-                />
-               
-            </Grid> */}
+            <Grid item >
+                <TextField id="filled-basic" label="Query" />
+            </Grid>
             <Grid item>
-                <Button variant="contained" color="primary" onClick={onSearch}>
+                <Button variant="contained" color="primary">
                     Search
                 </Button>
             </Grid>
@@ -135,11 +112,7 @@ export function TableView(props: TableProps) {
                                                 defaultValue=""
                                                 render={({ onChange, value }) => <TextField
                                                     label={config?.alias ? config.alias : key}
-                                                    onKeyDown={(e: any) => {
-                                                        if (e.key === 'Enter') {
-                                                            onSearch()
-                                                        }
-                                                    }}
+                                                    onKeyDown={onSearch}
                                                     value={value}
                                                     onChange={onChange}
                                                 />}

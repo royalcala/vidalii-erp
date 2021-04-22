@@ -29,70 +29,38 @@ export type TableProps = {
             alias?: string,
             format?: (value: any) => any
             search?: boolean
-            searchFormat?: (value: any) => any
         }
-    },
+    },    
     open: {
         url: string,//-->/System.User
         parameters: string[]//-->_id
     } // /route/:slug
 }
 
-
-
-
 export function TableView(props: TableProps) {
+    console.log('redered TableView')
     const classes = useStyles();
     const { client } = React.useContext(Session)
     const [search, setSearch] = React.useState({})
-    const [isLoading, setIsLoading] = React.useState(false);
-    const [isError, setIsError] = React.useState(false);
-    const [data, setData] = React.useState([]);
-
-    React.useEffect(() => {
-        const fetchData = async () => {
-            setIsError(false);
-            setIsLoading(true);
-            try {
-                const { data } = await client.post<any[]>(props.api, search)
-
-                //@ts-ignore
-                setData(data);
-            } catch (error) {
-                setIsError(true);
-            }
-
-            setIsLoading(false);
-        };
-
-        fetchData();
-    }, [search])
-
+    const { isLoading, error, data } = useQuery("posts", async () => {
+        const { data } = await client.post<any[]>(props.api, search)
+        return data 
+    });
     const entries = Object.entries(props.config)
     const { control, getValues } = useForm<{}>()
-
-    const onSearch = () => {
-        const entries = Object.entries(getValues()).filter(
-            ([key, value]) => value !== ''
-        ).map(
-            ([key, value]) => {
-                if (props.config[key]?.searchFormat !== undefined) {  
-                    //@ts-ignore                  
-                    return [key, props.config[key].searchFormat(value)]
-                }
-                else //default
-                    return [key, { $like: `%${value}%` }]
-            }
-        )
-        let filter = Object.fromEntries(entries)
-        console.log({ filter })
-        //reload table
-        setSearch(filter)
+    const onSearch = (e: any) => {
+        if (e.key === 'Enter') {
+            const entries = Object.entries(getValues()).filter(
+                ([key, value]) => value !== ''
+            )
+            const filter = Object.fromEntries(entries)
+            console.log({filter})
+            //reload table
+            setSearch(filter)
+        }
     }
-
-
     if (isLoading) return <div>Loading...</div>
-    if (isError) return <div>Error</div>
+    if (error) return <div>Error</div>
     return (
         <Grid
             container
@@ -101,21 +69,11 @@ export function TableView(props: TableProps) {
             alignItems="center"
             spacing={3}
         >
-            {/* <Grid item >
-                <Controller
-                    name="query"
-                    control={control}
-                    defaultValue=""                   
-                    render={({ onChange, value }) =>  <TextField 
-                    id="query" label="Query" 
-                    value={value}
-                    onChange={onChange}
-                     />}
-                />
-               
-            </Grid> */}
+            <Grid item >
+                <TextField id="filled-basic" label="Query" />
+            </Grid>
             <Grid item>
-                <Button variant="contained" color="primary" onClick={onSearch}>
+                <Button variant="contained" color="primary">
                     Search
                 </Button>
             </Grid>
@@ -135,11 +93,7 @@ export function TableView(props: TableProps) {
                                                 defaultValue=""
                                                 render={({ onChange, value }) => <TextField
                                                     label={config?.alias ? config.alias : key}
-                                                    onKeyDown={(e: any) => {
-                                                        if (e.key === 'Enter') {
-                                                            onSearch()
-                                                        }
-                                                    }}
+                                                    onKeyDown={onSearch}
                                                     value={value}
                                                     onChange={onChange}
                                                 />}

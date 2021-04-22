@@ -1,9 +1,13 @@
 import React from "react";
 import { Route } from "components/core/routes/Routes.many.rcontext";
 import AccountIcon from 'template-icons/AccountCircle';
-import { useQuery } from "graphql-hooks";
+// import { useQuery } from "graphql-hooks";
 import { Dashboard, Props } from "../admin/Admin.Dashboard";
 import PeopleIcon from 'template-icons/People';
+import { useQuery } from 'react-query'
+import axios from 'axios'
+import { Session } from "./User.Session";
+
 const route: Route = {
     name: 'Users',
     parent: 'System',
@@ -13,60 +17,57 @@ const route: Route = {
 }
 export default route
 
-
-const QUERY = `#graphql
-query Users{
-    users:userFind {
-      _id
-      name
-      lastname
-      email
-      phone
-      groups      
-    }
-  }`
+function useUsers() {
+    const { client } = React.useContext(Session)
+    return useQuery("posts", async () => {
+        const { data } = await client.post('/api/userFind', {})
+        // const { data } = await axios.get(
+        //     "https://jsonplaceholder.typicode.com/posts"
+        // );
+        return data;
+    });
+}
 
 
 function Users() {
-    const { loading, error, data } = useQuery(QUERY)
-    if (loading) return 'Loading...'
-    if (error) return 'Error:' + JSON.stringify(error)
-
     const props: Props = {
         Icon: route.Icon,
         name: route.name,
         parent: route.parent,
         table: {
+            api: '/api/userFind',
             config: {
                 _id: {
-                    type: 'string',
-                    search:true
+                    search: true
                 },
-                name: {
-                    type: "string",
-                    search:true
+                firstname: {
+                    search: true
                 },
                 lastname: {
-                    type: "string",
-                    search:true
+                    search: true
                 },
                 email: {
-                    type: "email",
-                    search:true
+                    search: true
                 },
                 phone: {
-                    type: "number",
-                    search:true
+                    search: true
                 },
                 groups: {
-                    type: "number"
+                    search: true,
+                    searchFormat: (value) => ({
+                        name: {
+                            "$like": `%${value}%`
+                        }
+                    }),
+                    format: (data: { _id: string, name: string }[]) => data.map(d => d.name).join(', ')
                 }
             },
-            data: data.users,
             open: { url: "/System.User", parameters: ['_id'] }
 
         }
     }
+
+
     return <Dashboard {...props} />
 }
 

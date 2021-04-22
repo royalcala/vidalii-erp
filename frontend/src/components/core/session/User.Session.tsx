@@ -9,8 +9,8 @@ import { useMutation } from 'react-query'
 export const Session = React.createContext<{
     session: null | string,
     closeSession: () => void,
-    client?: AxiosInstance
-}>({ session: null, closeSession: () => { } })
+    client: AxiosInstance
+}>({ session: null, closeSession: () => { },client:axios.create() })
 
 
 const AUTH = 'authorization'
@@ -19,6 +19,7 @@ export default function UserSession() {
     const mutation = useMutation((credentials: { email: string, password: string }) => axios.post('/api/userLogin', credentials),
         {
             onSuccess: (data, variables, context) => {
+                localStorage.setItem(AUTH, data.data)
                 setSession(data.data)
             }
         })

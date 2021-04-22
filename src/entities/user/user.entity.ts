@@ -126,25 +126,22 @@ app.post('/api/userLogin', async (req: any, res) => {
         }
 
     }
-
-
-
-
-
-
-
-
 })
 
 
 
 
-app.post('/userFind', async (req: any, res) => {
-    const users = await db.orm.em.find(User, req.body)
-    res.send(users)
+app.post('/api/userFind', async (req: any, res) => {
+    try {
+        const users = await db.orm.em.find(User, req.body, ['groups'])
+        res.send(users)   
+    } catch (error) {
+       res.status(400).send(`Error Query`)
+    }
+
 })
 
-app.post('/userInsert', async (req: any, res, next) => {
+app.post('/api/userInsert', async (req: any, res, next) => {
     const data = req.body as User
     const user = db.orm.em.assign(new User(data.password), data)
     await val.validateOrReject(user)
@@ -154,11 +151,13 @@ app.post('/userInsert', async (req: any, res, next) => {
 
 })
 
-app.post('/userUpdate', async (req: any, res) => {
+app.post('/api/userUpdate', async (req: any, res) => {
     const data = req.body as User
     let user = await db.orm.em.findOne(User, data._id)
     user = db.orm.em.assign(user, data)
     await db.orm.em.flush()
     res.send()
 })
+
+
 

@@ -31,7 +31,6 @@ export type Props = {
     table: TableProps
 }
 export function Dashboard(props: Props) {
-    const [query, setQuery] = React.useState()
 
     const classes = useStyles();
     return <Paper className={classes.paper}>
@@ -52,8 +51,10 @@ export function Dashboard(props: Props) {
                     </Typography>
                 </Breadcrumbs>
             </Grid>
-            <Grid item xs={12}>
-                <TableView config={props.table.config} data={props.table.data} open={props.table.open} />
+            <Grid item xs={12}>                
+                <TableView 
+                {...props.table}
+              />
             </Grid>
         </Grid>
     </Paper>

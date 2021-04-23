@@ -41,7 +41,7 @@ export type Props = {
         Icon: Function
     },
     gql: {
-        mutation: Map<Symbol, () => any>,
+        mutation: Map<Symbol, () => string>,
     }
 }
 
@@ -52,9 +52,14 @@ export function DocSave({ breadcrum, gql }: Props) {
     const p = useLocation().pathname.split('/')
     const location = (p[0] + '_' + p[1]).replace('.', '_')
     const saveDocOnClick = async () => {
-        await Promise.all(Array.from(gql.mutation.values()).map(
-            (fx)=>fx()
-        ))
+        let query = Array.from(gql.mutation.values()).map(
+            values => values()
+        ).join(' ')
+        query = `mutation ${location}{ ${query} }`
+        console.log({ query })
+        const response = await client.request({
+            query
+        })
     }
 
     return (

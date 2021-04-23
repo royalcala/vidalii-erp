@@ -17,16 +17,16 @@ const route: Route = {
 }
 export default route
 
-function useUsers() {
-    const { client } = React.useContext(Session)
-    return useQuery("posts", async () => {
-        const { data } = await client.post('/api/userFind', {})
-        // const { data } = await axios.get(
-        //     "https://jsonplaceholder.typicode.com/posts"
-        // );
-        return data;
-    });
-}
+// function useUsers() {
+//     const { client } = React.useContext(Session)
+//     return useQuery("posts", async () => {
+//         const { data } = await client.post('/api/userFind', {})
+//         // const { data } = await axios.get(
+//         //     "https://jsonplaceholder.typicode.com/posts"
+//         // );
+//         return data;
+//     });
+// }
 
 
 function Users() {

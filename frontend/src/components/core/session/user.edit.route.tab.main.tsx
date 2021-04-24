@@ -1,5 +1,5 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { PropsTab, Tab } from '../admin/Admin.Doc.Tabs';
 
 // import { useQuery } from 'graphql-hooks';
@@ -8,61 +8,126 @@ import { Form, FormProps } from '../form/form';
 // import { objectString } from '../form/utils';
 import { useQuery } from 'react-query'
 import { Session } from './User.Session';
+import TextField from 'template-core/TextField';
+import Box from 'template-core/Box';
+import makeStyles from 'template-core/styles/makeStyles';
+import createStyles from 'template-core/styles/createStyles';
+import { Theme } from 'template-core/styles';
+import Select from 'react-select'
+import Grid from 'template-core/Grid';
+import { FormLabel, Typography } from 'template-core';
+import { SelectMultiSync } from '../form/select.multi.sync'
 
-
-function useUser(_id: string) {
+function useFetchData(_id: string) {
   const { client } = React.useContext(Session)
   return useQuery("user", async () => {
-    const { data } = await client.post('/api/userFind', { _id })
-    // const { data } = await axios.get(
-    //     "https://jsonplaceholder.typicode.com/posts"
-    // );
-    return data;
+    const user = client.post('/api/userFind', { _id })
+    const groups = client.post('/api/groupFind', {})
+    const data = await Promise.all([user, groups])
+    console.log(data)
+    return {
+      user: data[0].data[0],
+      groups: data[1].data
+    };
   });
 }
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      flexGrow: 1,
+    },
+    label: {
+      fontSize: 12
+    }
+  }),
+);
+const customStyles = {
+  // option: (provided:any, state:any) => ({
+  //   ...provided,
+  //   borderBottom: '1px dotted pink',
+  //   color: state.isSelected ? 'red' : 'blue',
+  //   padding: 20,
+  // }),
+  // control: () => ({
+  //   // none of react-select's styles are passed to <Control />
+  //   width: 200,
+  // }),
+  // singleValue: (provided:any, state:any) => {
+  //   const opacity = state.isDisabled ? 0.5 : 1;
+  //   const transition = 'opacity 300ms';
+
+  //   return { ...provided, opacity, transition };
+  // }
+}
+const options = [
+  { value: 'chocolate', label: 'Chocolate' },
+  { value: 'strawberry', label: 'Strawberry' },
+  { value: 'vanilla', label: 'Vanilla' }
+]
 const Mutation = Symbol()
 function TabMain({ mutation }: PropsTab) {
+  const classes = useStyles();
+  const { client } = React.useContext(Session)
   const { control, getValues } = useForm<{}>()
   let params: any = useParams();
-  const { data, isError, isLoading } = useUser(params._id)
-  console.log(data)
+  let { data, isError, isLoading } = useFetchData(params._id)
+
   mutation.set(Mutation,
-    () => {
-      alert("hi")
+    async () => {
+      console.log(getValues())
+      // const { data } = await client.post<any[]>('/api/userUpdate', getValues())
     }
   )
 
 
   if (isLoading) return 'loading...'
   if (isError) return 'Error.'
+  if ( data?.user.length === 0) return <div>User not found</div>
 
-  const config: FormProps['config'] = {
-    firstname: {
-      type: 'string'
-    },
-    lastname: {
-      type: 'string'
-    },
-    email: {
-      type: 'email'
-    },
-    groups: {
-      type: "autocomplete",
-      autoComplete: {
-        isMulti: true,
-        loadOptions: async (inputValue) => data[0].groups.filter(
-          (group: { _id: string, name: string }) => group.name.toLowerCase()
-            .includes(inputValue.toLowerCase())
-        )
-      }
-    }
-  }
+  return (
+    <Grid container className={classes.root} spacing={2}>
+      {[
+        'firstname',
+        'lastname',
+        'email',
+        'phone',
+      ].map(
+        (value, index) => <Controller
+          name={value}
+          control={control}
+          defaultValue={data?.user[value]}
+          render={(data: any) => {
+            return (
+              <Grid key={index} item>
+                <TextField label={value} {...data} />
+              </Grid>
+            )
+          }
 
-  return <Form
-    data={data[0]}
-    config={config}
-    control={control}
-  />
+          }
+        />
+      )}
+      <Grid key="groups" item>
+        {/* <Controller
+          name="groups"
+          control={control}
+          defaultValue={data?.user.groups.map(({ _id, name }: { _id: string, name: string }) => ({ value: _id, label: name }))}
+          render={({ onChange, value }: any) => {
+            return (
+              <SelectMultiSync
+                name="groups"
+                defaultValue={value}
+                onChange={onChange}
+                options={[{ label: "orange", value: "1" }]}
+              />
+            )
+          }
+
+          }
+        /> */}
+      </Grid>
+    </Grid>
+  )
 }
 
 

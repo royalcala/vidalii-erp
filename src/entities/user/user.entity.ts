@@ -128,9 +128,6 @@ app.post('/api/userLogin', async (req: any, res) => {
     }
 })
 
-
-
-
 app.post('/api/userFind', async (req: any, res) => {
     try {
         const users = await db.orm.em.find(User, req.body, ['groups'])
@@ -138,7 +135,6 @@ app.post('/api/userFind', async (req: any, res) => {
     } catch (error) {
        res.status(400).send(`Error Query`)
     }
-
 })
 
 app.post('/api/userInsert', async (req: any, res, next) => {
@@ -152,11 +148,16 @@ app.post('/api/userInsert', async (req: any, res, next) => {
 })
 
 app.post('/api/userUpdate', async (req: any, res) => {
-    const data = req.body as User
-    let user = await db.orm.em.findOne(User, data._id)
-    user = db.orm.em.assign(user, data)
-    await db.orm.em.flush()
-    res.send()
+    try {
+        const data = req.body as User
+        let user = await db.orm.em.findOne(User, data._id)
+        user = db.orm.em.assign(user, data)
+        await db.orm.em.flush()
+        res.send()    
+    } catch (error) {
+        res.status(400).send(`Error`)
+    }
+    
 })
 
 
